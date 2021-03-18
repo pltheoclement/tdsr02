@@ -1,0 +1,19 @@
+int main ( ) {
+pid_t fils_pid ; fils_ pid=fork ( ) ;
+signal = 
+if (fils_ pid==0){
+    srand(time(NULL)); // Initialization, should only be called once.
+    int r = rand(); // Returns a pseudo-random integer between 0 and RAND_MAX.
+    printf("Voici un nombre aléatoire %d\n",r%40);
+    printf (" Je suis le fils avec pid %d\n" , getpid ( ) ) ;
+
+}
+else if ( fils_pid > 0 ) {
+printf ("Je suis le père avec pid %d.\n" , getpid ( ) ) ;
+printf ( " J'attends que mon fils se termine\n" ) ;
+pause();
+kill(fils_pid,SIGUSR1);
+}
+else printf ( " Erreur dans la création du fils \n" ) ;
+exit( 0 ) ;
+}
