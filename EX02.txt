@@ -39,7 +39,7 @@ void handler_fils(int x){
     cpt_fils++;
     kill(pid_pere,SIGUSR1);
 }
-main(){
+int main(){
     pid_fils=fork();
     if(pid_fils==0){
         /*processus fils: minuscules*/
