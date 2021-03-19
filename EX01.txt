@@ -1,42 +1,42 @@
-void gestion_fils(){
-    srand(time(NULL)); // Initialisation
-    int r = rand()%30+10; // Return int between 10 and 40;
-    printf(" la température est de %d degré Celsius \n",r);
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <time.h>
+
+
+pid_t pid;
+struct sigaction act_thermometre, act_alarme;
+void handler_thermometre(int x){
+    int rnd=(random()/(RAND_MAX*1.0))*40;
+    printf("Temperature = %d C°\n",rnd);
 }
 
-void gestion_pere(){
-kill(pid,SIGUSR1);
-alarm(5);
-}
-
-int main ( ) {
-pid_t fils_pid ; 
-fils_pid=fork () ;
-struct sigaction signal ;
-
-if (fils_ pid==0){
-    signal.sa_handler = gestion_fils();
-    signal.sa_flag=0;
-    sigemptyset(&signal.sa_mask);
-    sigaction(SIGUSR1,&signal,NULL);
-    while(1) {
-        pause(); // en attente d'un signal
-    }
-    break;
-}
-else if ( fils_pid > 0 ) {
-    signal.sa_handler= gestion_pere();
-    signal.sa_flag=0;
-    sigemptyset(&signal.sa_mask);
-    sigaction(SIGALARM,&signal,NULL);
+void handler_alarme(int x){
+    kill(pid,SIGUSR1);
     alarm(5);
-    while(1){
-        sleep(1);
-        printf("père-");
-    }
-    break;
-
 }
-else printf ( " Erreur dans la création du fils \n" ) ;
-exit( 0 ) ;
+int main(){
+    srand(time(NULL));   
+    
+    pid=fork();
+    if(pid==0){
+        /*processus fils: thermometre*/
+        act_thermometre.sa_handler=handler_thermometre;
+        sigaction(SIGUSR1,&act_thermometre,NULL);
+        while(1){
+            pause();
+        }
+    }else{
+        /*processus pere: mesure périodique*/
+        act_alarme.sa_handler=handler_alarme;
+        sigaction(SIGALRM,&act_alarme,NULL);
+        alarm(5);
+        while(1){
+            sleep(1);
+            printf("-");
+            fflush(stdout);
+        }
+    }
 }
