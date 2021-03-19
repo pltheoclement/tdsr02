@@ -1,48 +1,61 @@
-void gestion_fils(){
-    char lettre;
-    lettre= a
-    printf("%c",lettre);
-    fflush(stdout);
-    lettre+=1;
-    kill(getppid(),SIGUSR1);
-}
+//Exercice 2 TD2
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <signal.h>
+struct sigaction act_pere, act_fils;
+pid_t pid_fils, pid_pere;
+int cpt_pere=1, cpt_fils=1; /* nombre de caractères afficher*/
+char car_pere='A', car_fils='a'; /* caractère à afficher*/
 
-void gestion_pere(){
-    char lettre2;
-    lettre =A;
-    printf("%c",lettre2);
-    fflush(stdout);
-    lettre2+=1;
-    kill(pid,SIGUSR1);
-}
-
-int main ( ) {
-pid_t fils_pid ; 
-fils_pid=fork () ;
-struct sigaction signal ;
-
-if (fils_ pid==0){
-    signal.sa_handler = gestion_fils();
-    signal.sa_flag=0;
-    sigemptyset(&signal.sa_mask);
-    sigaction(SIGUSR1,&signal,NULL);
-    while(1) {
-        pause(); // en attente d'un signal
+void handler_pere(int x){
+    int i;
+    for(i=0;i<cpt_pere;i++){
+        if(car_pere<='Z'){
+            printf("%c",car_pere);
+            fflush(stdout);
+            car_pere++;
+        }else{
+            printf("\n");
+            exit(0);
+        }
     }
-    break;
+    cpt_pere++;
+    kill(pid_fils,SIGUSR1);
 }
-else if ( fils_pid > 0 ) {
-    signal.sa_handler= gestion_pere();
-    signal.sa_flag=0;
-    sigemptyset(&signal.sa_mask);
-    sigaction(SIGUSR1,&signal,NULL);
-    
-    while(1){
-        pause();
+void handler_fils(int x){
+    int i;
+    for(i=0;i<cpt_fils;i++){
+        if(car_fils<='z'){
+            printf("%c",car_fils);
+            fflush(stdout);
+            car_fils++;
+        }else{
+            kill(pid_pere,SIGUSR1);
+            exit(0);
+        }
     }
-    break;
-
+    cpt_fils++;
+    kill(pid_pere,SIGUSR1);
 }
-else printf ( " Erreur dans la création du fils \n" ) ;
-exit( 0 ) ;
+main(){
+    pid_fils=fork();
+    if(pid_fils==0){
+        /*processus fils: minuscules*/
+        pid_pere=getppid();
+        act_fils.sa_handler=handler_fils;
+        sigaction(SIGUSR1,&act_fils,NULL);
+        while(1){
+            pause();
+        }
+    }else{      /*processus pere: majuscules*/
+        act_pere.sa_handler=handler_pere;
+        sigaction(SIGUSR1,&act_pere,NULL);
+        sleep(1);
+        kill(pid_fils,SIGUSR1);
+        while(1){
+            pause();
+        }
+    }
 }
