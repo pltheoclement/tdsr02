@@ -1,18 +1,41 @@
-int main ( ) {
-pid_t fils_pid ; fils_ pid=fork ( ) ;
-signal = 
-if (fils_ pid==0){
-    srand(time(NULL)); // Initialization, should only be called once.
-    int r = rand(); // Returns a pseudo-random integer between 0 and RAND_MAX.
-    printf("Voici un nombre aléatoire %d\n",r%40);
-    printf (" Je suis le fils avec pid %d\n" , getpid ( ) ) ;
+void gestion_fils(){
+    srand(time(NULL)); // Initialisation
+    int r = rand()%30+10; // Return int between 10 and 40;
+    printf(" la température est de %d degré Celsius \n",r);
+}
 
+void gestion_pere(){
+kill(pid,SIGUSR1);
+alarm(5);
+}
+
+int main ( ) {
+pid_t fils_pid ; 
+fils_pid=fork () ;
+struct sigaction signal ;
+
+if (fils_ pid==0){
+    signal.sa_handler = gestion_fils();
+    signal.sa_flag=0;
+    sigemptyset(&signal.sa_mask);
+    sigaction(SIGUSR1,&signal,NULL);
+    while(1) {
+        pause(); // en attente d'un signal
+    }
+    break;
 }
 else if ( fils_pid > 0 ) {
-printf ("Je suis le père avec pid %d.\n" , getpid ( ) ) ;
-printf ( " J'attends que mon fils se termine\n" ) ;
-pause();
-kill(fils_pid,SIGUSR1);
+    signal.sa_handler= gestion_pere();
+    signal.sa_flag=0;
+    sigemptyset(&signal.sa_mask);
+    sigaction(SIGALARM,&signal,NULL);
+    alarm(5);
+    while(1){
+        sleep(1);
+        printf("père-");
+    }
+    break;
+
 }
 else printf ( " Erreur dans la création du fils \n" ) ;
 exit( 0 ) ;
