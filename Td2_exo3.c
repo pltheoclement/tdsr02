@@ -34,8 +34,6 @@ void captpere()
 
 int main() {
     pid_fils = fork();
-    struct sigaction nact,oact; /* new act , old act */
-    struct sigaction qact;
     if (pid_fils==-1) {perror("echec du fork"); exit(0);}
     if (pid_fils==0) { /* fils */
         int i=0;
