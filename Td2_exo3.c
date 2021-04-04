@@ -32,7 +32,7 @@ void captpere()
 	}
 }
 
-int main() {
+int main(int nbarg, char *tbarg[]) {
     pid_fils = fork();
     if (pid_fils==-1) {perror("echec du fork"); exit(0);}
     if (pid_fils==0) { /* fils */
