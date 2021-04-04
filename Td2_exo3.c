@@ -11,7 +11,7 @@ int it_fils = 0 , it_pere = 0;
 void captfils()
 {
 	rectvert(5);
-    it_fils++;
+    	it_fils++;
 	printf("\n FILS %d : signal %d recu \n",getpid(), it_fils);
 	if (it_fils == 3) {
 		printf("\n FILS : fin du fils car trois signaux sont deja reçu. Le pid du mon pere est : %d\n",getppid());
